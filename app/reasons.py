@@ -9,6 +9,15 @@ REASONS = {
     'AMOUNT_DELTA': '复算与外部账计量不同', 'BOOK_CONFLICT': '独立账含重复业务键',
     'RUN_UNKNOWN': '没有此批次', 'DEMO_UNKNOWN': '没有此样例', 'STALE': '复核版本已过期',
     'REVIEW_NOTE': '有差异时须填写复核意见', 'REVIEW_DECISION': '复核结论无效',
+    'FLOW_HEADER': '扣款流水表头无效', 'FLOW_WIDTH': '扣款流水列数不符', 'FLOW_CONFLICT': '扣款流水号重复',
+    'RECEIPT_HEADER': '银行回单表头无效', 'RECEIPT_WIDTH': '银行回单列数不符', 'RECEIPT_DUP': '同一回单重复上传',
+    'RECEIPT_FLOW': '回单指向未知扣款流水', 'RECEIPT_STATEMENT': '回单指向未知结算单',
+    'RECEIPT_AMOUNT': '回单金额与结算单应付不符', 'RECEIPT_USED': '该结算单已被其他扣款核销',
+    'CLAIM_PENDING': '尚有扣款无凭据归属，不能会签确认', 'CLAIM_AMOUNT': '扣款金额与归属结算单合计不符',
+}
+
+CLAIM_STATUS = {
+    'WRITE_OFF': '凭据核销', 'CANDIDATE': '唯一候选·缺回单', 'PENDING': '待认领', 'DIFFERENCE': '金额差异',
 }
 
 REASONS.update({'ROYALTY_TIER': '合同费档无效', 'ROYALTY_RETURNS': '退量超累计销量', 'DATE': '日期格式无效', 'REV_BLOCKED': '较新来源尚未采信'})

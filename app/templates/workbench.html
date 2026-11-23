@@ -53,6 +53,16 @@
       <div id="tools" class="filters" hidden><label>筛选 <input id="filter" type="search" placeholder="作者结算单 / 原因" maxlength="80"></label>
         <label id="only-differences" hidden><input id="differences" type="checkbox"> 只看差异</label><output id="shown"></output></div>
       <div class="scroll" id="grid-data"><p class="empty">运行本班样例</p></div>
+      <form id="claim-box" class="panel__body" hidden>
+        <label>扣款流水 CSV <textarea id="flows-csv" aria-label="扣款流水 CSV" rows="3" placeholder="扣款流水号,扣款金额(元)"></textarea></label>
+        <label>银行回单 CSV <textarea id="receipts-csv" aria-label="银行回单 CSV" rows="3" placeholder="银行回单号,扣款流水号,结算单号,回单金额(元)"></textarea></label>
+        <div class="actions">
+          <button type="button" id="claim-sync" class="btn btn--primary">用流水对账</button>
+          <button type="button" id="claim-receipt" class="btn">补回单并核对</button>
+          <button type="button" id="claim-sample" class="btn">载入银行样例</button>
+        </div>
+        <p class="hint" id="claim-hint">同额多组组合一律挂「待认领」，只有回单能定归属；已核销结算单不能再抵另一笔扣款。</p>
+      </form>
       <form id="review" class="panel__body" hidden>
         <label>复核意见 <textarea id="review-note" maxlength="500" rows="2"></textarea></label>
         <div class="actions"><label>结论 <select id="decision"><option>确认</option><option>退回</option></select></label>
@@ -63,6 +73,6 @@
       <footer class="statusbar"><span id="state" role="status">等待输入</span><a href="/openapi.json">接口</a><span>UTC</span></footer>
     </div>
   </div>
-  <script type="application/json" id="settings">{{ {'reasons': reasons, 'tabs': tabs, 'unit': unit, 'key': key}|tojson }}</script>
+  <script type="application/json" id="settings">{{ {'reasons': reasons, 'claim_status': claim_status, 'tabs': tabs, 'unit': unit, 'key': key}|tojson }}</script>
 </body>
 </html>

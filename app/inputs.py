@@ -50,8 +50,25 @@ class Review(BaseModel):
     note: str = Field(default='',max_length=500)
 
 
+class ClaimFlow(BaseModel):
+    flows: CsvText | None = None
+    flows_base64: EncodedCsv | None = None
+
+    def payload(self):
+        return input_bytes(self.flows, self.flows_base64, SAMPLE_ROOT/'bank_flows.csv')
+
+
+class ClaimReceipt(BaseModel):
+    receipts: CsvText | None = None
+    receipts_base64: EncodedCsv | None = None
+
+    def payload(self):
+        return input_bytes(self.receipts, self.receipts_base64, SAMPLE_ROOT/'bank_receipts.csv')
+
+
 def read_sample(name):
-    choices = {'shift':'shift.csv','external':'external.csv'}
+    choices = {'shift':'shift.csv','external':'external.csv',
+               'flows':'bank_flows.csv','receipts':'bank_receipts.csv'}
     if name not in choices:
         raise DataError('DEMO_UNKNOWN','没有此样例',404)
     return SAMPLE_ROOT.joinpath(choices[name]).read_bytes()

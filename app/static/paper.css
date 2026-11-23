@@ -64,6 +64,10 @@
     .state.problem { color: var(--bad); }
     .state { border-bottom: 1px dashed currentColor; padding: 1px 0; }
     .empty { margin: var(--pad); color: var(--muted); }
+    .hint { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+    #grid-data h3 { margin: var(--pad) var(--pad) 6px; color: var(--accent); font-size: 13px; }
+    #grid-data h3:first-child { margin-top: 6px; }
+    #claim-box textarea { margin-bottom: 8px; }
     #signal { max-height: 386px; overflow: auto; }
     .signal dl, .signal ol { padding: 0; margin: 0; }
     .signal ol { list-style: none; }

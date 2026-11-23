@@ -13,6 +13,21 @@ CREATE TABLE IF NOT EXISTS reviews (
   decision TEXT NOT NULL, note TEXT NOT NULL, changed TEXT NOT NULL,
   PRIMARY KEY(run_id,version)
 );
+CREATE TABLE IF NOT EXISTS claim_flows (
+  run_id TEXT NOT NULL REFERENCES runs(id), flow_id TEXT NOT NULL,
+  amount TEXT NOT NULL, line INTEGER NOT NULL, created TEXT NOT NULL,
+  PRIMARY KEY(run_id,flow_id)
+);
+CREATE TABLE IF NOT EXISTS claim_receipts (
+  run_id TEXT NOT NULL, flow_id TEXT NOT NULL, statement_key TEXT NOT NULL,
+  receipt_id TEXT NOT NULL, amount TEXT NOT NULL, line INTEGER NOT NULL, received TEXT NOT NULL,
+  PRIMARY KEY(run_id,flow_id,statement_key)
+);
+CREATE TABLE IF NOT EXISTS claim_writeoffs (
+  run_id TEXT NOT NULL, flow_id TEXT NOT NULL, statement_key TEXT NOT NULL,
+  amount TEXT NOT NULL, receipt_line INTEGER NOT NULL, created TEXT NOT NULL,
+  PRIMARY KEY(run_id,flow_id,statement_key)
+);
 """
 
 

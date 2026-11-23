@@ -43,6 +43,33 @@ function tag(code) {
   return el('span', settings.reasons[code] || code, code === 'MATCH' ? 'state' : 'state problem');
 }
 
+function claimTag(code) {
+  const ok = code === 'WRITE_OFF';
+  return el('span', settings.claim_status[code] || code, ok ? 'state' : 'state problem');
+}
+
+function claimTables(state) {
+  const fragment = document.createDocumentFragment();
+  const flowColumns = [
+    ['扣款流水号', 'flow_id'], ['扣款金额 · 元', 'amount', 'num'], ['状态', row => claimTag(row.status)],
+    ['差额', 'delta', 'num'],
+    ['凭据归属', row => row.matched.map(item => `${item.key}（${item.amount}，回单 ${item.receipt_id} 行 ${item.receipt_line}）`).join('；') || '—'],
+    ['无凭据候选', row => row.candidates.map(group => group.join(' + ')).join('；') || '—'],
+  ];
+  const flowTitle = el('h3', `扣款流水（${state.flows.length} 笔）`);
+  const flowWrap = el('div');
+  table(flowWrap, flowColumns, state.flows);
+  const statementColumns = [
+    [settings.key, 'key'], ['应付 · 元', 'amount', 'num'], ['状态', row => claimTag(row.status)],
+    ['归属扣款', row => Array.isArray(row.flow_id) ? row.flow_id.join('、') : row.flow_id],
+  ];
+  const statementTitle = el('h3', `结算单归属（${state.statements.length} 张，已核销 ${state.counts.claimed} 张）`);
+  const statementWrap = el('div');
+  table(statementWrap, statementColumns, state.statements);
+  fragment.append(flowTitle, flowWrap, statementTitle, statementWrap);
+  return fragment;
+}
+
 
 function showEvidence(row) {
   const panel = byId('evidence-panel');
@@ -93,6 +120,7 @@ async function render() {
   const stage = selected;
   byId('phase').textContent = settings.tabs[stage];
   byId('review').hidden = true;
+  byId('claim-box').hidden = stage !== 'claim';
   for (const link of links) {
     if (link.dataset.module === stage) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
@@ -104,6 +132,16 @@ async function render() {
   const line = ['行号', 'line', 'num'];
   try {
     let view, rows;
+    if (stage === 'claim') {
+      const state = await query(`/api/claim/${id}`);
+      body.replaceChildren(claimTables(state));
+      byId('tools').hidden = true;
+      byId('only-differences').hidden = true;
+      byId('shown').textContent = state.ready
+        ? '全部扣款已凭回单核销，可会签确认'
+        : `${state.counts.write_off} 笔已核销 · ${state.counts.candidate + state.counts.pending} 笔待凭据 · ${state.counts.difference} 笔差异`;
+      return;
+    }
     if (stage === 'domain') {
       view = [key, [`本期应付 · ${settings.unit}`, 'amount', 'num'], line, ['明细依据', inspect]];
       rows = result.accepted;
@@ -242,5 +280,29 @@ byId('review').addEventListener('submit', async event => {
     notice(error.message, true);
     if (error.status === 409) await render();
   }
+});
+async function claimAction(path, field) {
+  if (!result) { notice('请先运行版税核算批次', true); return; }
+  const text = byId(field).value.trim();
+  if (!text) { notice('请先粘贴或载入 CSV', true); return; }
+  const keyName = field === 'flows-csv' ? 'flows' : 'receipts';
+  try {
+    const state = await query(path, {[keyName]: text});
+    notice(state.ready ? '全部扣款已有凭据归属' : '已核对，仍有扣款等待回单');
+    await render();
+  } catch (error) { notice(error.message, true); }
+}
+byId('claim-sync').addEventListener('click', () => claimAction(`/api/claim/${result.manifest.run_id}/sync`, 'flows-csv'));
+byId('claim-receipt').addEventListener('click', () => claimAction(`/api/claim/${result.manifest.run_id}/receipts`, 'receipts-csv'));
+byId('claim-sample').addEventListener('click', async () => {
+  try {
+    const [flowResp, receiptResp] = await Promise.all([
+      fetch('/api/samples/flows'), fetch('/api/samples/receipts'),
+    ]);
+    if (!flowResp.ok || !receiptResp.ok) throw Error('银行样例暂时不可用');
+    byId('flows-csv').value = await flowResp.text();
+    byId('receipts-csv').value = await receiptResp.text();
+    notice('银行流水与回单样例已载入（可先只交流水，再分段补回单）');
+  } catch (error) { notice(error.message, true); }
 });
 render();

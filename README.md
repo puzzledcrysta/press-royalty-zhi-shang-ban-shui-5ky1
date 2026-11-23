@@ -18,6 +18,7 @@ docker compose up --build
 2. 在「争议结算单」区分冲突、业务拒绝、重传与旧版本。
 3. 打开「版税核算」并点击任意记录的「查看依据」。
 4. 在「财务勾稽」检查金额或用量差异。通过「月结批次」复算原文件，通过「会签底稿」提交意见并下载证据。
+5. 在「扣款认领」上传银行扣款流水与回单：同额多组组合挂待认领，补回单后再核对；只有凭据核销齐全的批次才能会签确认。
 
 接口定义见 `/openapi.json`。字段、允许区间及算例见 [数据字典](docs/DATA-DICTIONARY.md)，模块和回归测试见 [测试登记](docs/DEPTH.md)。
 
@@ -28,4 +29,4 @@ docker compose config --quiet
 docker compose exec -T app pytest -q
 ```
 
-`sample_data/shift.csv` 是班次数据，`sample_data/external.csv` 是独立账样例。`cases.csv` 固定业务反例，`legacy.csv` 和 `truncated.csv` 用于验证历史格式与断行。
+`sample_data/shift.csv` 是班次数据，`sample_data/external.csv` 是独立账样例。`cases.csv` 固定业务反例，`legacy.csv` 和 `truncated.csv` 用于验证历史格式与断行。`bank_flows.csv` 是合并扣款流水，`bank_receipts.csv` 是分批补齐的银行回单（含同额两组的归属凭据）。
